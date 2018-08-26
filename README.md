@@ -44,7 +44,8 @@ $ truffle test
 ### Run
 
 ```
-// Launch Ganache (Mac OS)
+// Assuming Ganache (Mac OS) is launched...
+
 $ npm run start
 
 // Head to http://localhost:3000
