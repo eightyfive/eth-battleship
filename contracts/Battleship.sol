@@ -26,6 +26,41 @@ contract Battleship is Ownable
   int8 constant MISS = -1;
 
   //
+  // State definition
+  //
+
+  bool private emergency = false;
+
+  enum GameStatus { OPEN, READY, STARTED, FINISHED, DONE }
+
+  /// @dev Note on "ocean/target" grids:
+  /// @dev "Ocean" is the lower grid on a normal battleship boardgame (where you place your ships)
+  /// @dev "Target" is the upper grid on a normal battleship boardgame (where you aim at your opponent)
+  /// @dev Implementation: "Target" of player A is "Ocean" of Player B
+  //
+  /// @dev Kept same types together (struct best practice)
+  /// @dev Tried to define types as precise as possible (best practice)
+  struct Game {
+    GameStatus status;
+    uint8 gridSize;
+    uint8 targetIndex;
+    address owner;
+    address challenger;
+    address turn;
+    address winner;
+    mapping (address => bytes32) secrets;
+    mapping (address => string) ships;
+    mapping (address => int8[]) targets;
+    mapping (address => bool) cheated;
+  }
+
+  /// @dev self-explanatory
+  Game[] public games;
+
+  /// @dev Maps address to array of game IDs
+  mapping (address => uint[]) private playerGames;
+
+  //
   // Modifiers
   //
 
@@ -71,6 +106,11 @@ contract Battleship is Ownable
     _;
   }
 
+  modifier notEmergency {
+    require(!emergency);
+    _;
+  }
+
   //
   // Events
   //
@@ -112,39 +152,6 @@ contract Battleship is Ownable
   event GameRevealed(uint gameId, address indexed revealer, address indexed opponent, string ships, bool void);
 
   //
-  // State definition
-  //
-
-  enum GameStatus { OPEN, READY, STARTED, FINISHED, DONE }
-
-  /// @dev Note on "ocean/target" grids:
-  /// @dev "Ocean" is the lower grid on a normal battleship boardgame (where you place your ships)
-  /// @dev "Target" is the upper grid on a normal battleship boardgame (where you aim at your opponent)
-  /// @dev Implementation: "Target" of player A is "Ocean" of Player B
-  //
-  /// @dev Kept same types together (struct best practice)
-  /// @dev Tried to define types as precise as possible (best practice)
-  struct Game {
-    GameStatus status;
-    uint8 gridSize;
-    uint8 targetIndex;
-    address owner;
-    address challenger;
-    address turn;
-    address winner;
-    mapping (address => bytes32) secrets;
-    mapping (address => string) ships;
-    mapping (address => int8[]) targets;
-    mapping (address => bool) cheated;
-  }
-
-  /// @dev self-explanatory
-  Game[] public games;
-
-  /// @dev Maps address to array of game IDs
-  mapping (address => uint[]) private playerGames;
-
-  //
   // Functions
   // https://solidity.readthedocs.io/en/v0.4.24/style-guide.html#order-of-functions
   //
@@ -181,10 +188,14 @@ contract Battleship is Ownable
   //
   // Public functions
   //
+  function toggleEmergency() onlyOwner public
+  {
+    emergency = !emergency;
+  }
 
   /// @param gridSize Size of the grid(s). Ex: size = 3 --> 9 positions.
   /// @param secret Obfuscated ships positions (revealed at the end of the game)
-  function createGame(uint8 gridSize, bytes32 secret) public
+  function createGame(uint8 gridSize, bytes32 secret) public notEmergency
   {
     // Game ID is just the normal array index.
     uint gameId = games.length;
@@ -208,7 +219,7 @@ contract Battleship is Ownable
 
   /// @param gameId Game ID
   /// @param secret Obfuscated ships positions
-  function joinGame(uint gameId, bytes32 secret) public gameOpen(gameId)
+  function joinGame(uint gameId, bytes32 secret) public notEmergency gameOpen(gameId)
   {
     require(msg.sender != games[gameId].owner);
 
@@ -411,7 +422,7 @@ contract Battleship is Ownable
   }
 
   //
-  // ConsenSys Final project requirement
+  // ConsenSys Final project Library requirement
   //
   function safeMath(uint8 value, uint8 increment) public returns(uint8)
   {
