@@ -72,6 +72,6 @@ Since my project did not require the use of a library, I created a dedicated uni
 Unfortunately I did not have time to do the following:
 
 - Implement the **UI** of the reveal phase (but "reveal" works in Tests !!)
-- Implement the "betting" part fo the challenge
+- Implement the "betting" part of the challenge
 
 
