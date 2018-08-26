@@ -17,21 +17,14 @@ Simple battleship game implemented on the ethereum blockchain (solidity).
 
 ## Setup
 
-### Note
-
-This demo app does not work well with Metamask. I did not have the time to optimize the UX when using Metamask, resulting in poor
-UX, notably rather long times between game `state` update.
-
-It works flawlessly with a local Ganache blockchain, hence the demp is setup to use Ganache (forced), and ignores MetaMask provider.
-
-I will optimize the app for Metamask eventually.
-
 ### Requirements
 
 In order to run this project locally, you will need:
 
+- [Truffle](https://truffleframework.com/truffle)
 - [Ganache](https://truffleframework.com/ganache)
-- Mac OS (**Not** tested on MS Windows)
+- Mac OS (**not** tested on MS Windows)
+- Latest browser (extensive use of ES5)
 
 ### Install
 
@@ -39,14 +32,38 @@ In order to run this project locally, you will need:
 $ git clone https://github.com/eightyfive/eth-battleship.git
 $ cd eth-battleship
 $ npm install
+$ truffle compile
+$ truffle migrate --network ganache
+
+// NOTE: All compile warnings come from external libraries/contracts
+
+# Optionally
+$ truffle test
 ```
 
 ### Run
 
 ```
 // Launch Ganache (Mac OS)
-
 $ npm run start
 
-// Open URL: http://localhot:3000
+// Head to http://localhost:3000
 ```
+
+## `SafeMath` Library
+
+Since my project did not require the use of a library, I created a dedicated unit test demonstrating `uint` overflows and how the `SafeMath` Zeppelin library can help.
+
+- `Battleship.sol -> safeMath()`
+- `Battleship.sol -> notSafeMath()`
+- `test/battleship.js -> "...should +10 overflow (SafeMath)"`
+
+
+## TODO
+
+Unfortunately I did not have time to do the following:
+
+- Implement the **UI** of the reveal phase (but "reveal" works in Tests !!)
+- Implement the "betting" part fo the challenge
+
+
