@@ -24,7 +24,7 @@ In order to run this project locally, you will need:
 - [Truffle](https://truffleframework.com/truffle)
 - [Ganache](https://truffleframework.com/ganache)
 - Mac OS (**not** tested on MS Windows)
-- Latest browser (extensive use of ES5)
+- Modern browser with [Metamask](https://metamask.io) installed
 
 ### Install
 
