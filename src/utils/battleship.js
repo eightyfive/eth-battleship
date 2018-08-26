@@ -160,9 +160,25 @@ export function getStatus(status) {
   return statuses[status];
 }
 
-export function getSecrets(web3, account, ships) {
-  const salt = web3.eth.sign(account, _shuffle(ships).join(""));
+export function obfuscate(web3, ships) {
+  const salt = web3.sha3(_shuffle(ships).join(""));
   const secret = web3.sha3(ships.join("") + salt);
 
   return [secret, salt];
+
+  // Since Metamask is displaying a WARNING message
+  // When signin a message, I chose to not use signing anymore...
+  //
+  // return new Promise((resolve, reject) => {
+  //   web3.eth.sign(account, _shuffle(ships).join(""), (err, salt) => {
+  //     console.log(err, salt);
+  //     if (err) {
+  //       reject(err);
+  //     } else {
+  //       const secret = web3.sha3(ships.join("") + salt);
+  //       console.log(secret);
+  //       resolve([secret, salt]);
+  //     }
+  //   });
+  // });
 }

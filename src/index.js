@@ -14,7 +14,7 @@ window.addEventListener("load", async ev => {
     provider = window.web3.currentProvider;
   }
 
-  const web3 = createWeb3(provider);
+  const web3 = (window.web3 = createWeb3(provider));
   const app = new Application(web3, store);
 
   await app.init();

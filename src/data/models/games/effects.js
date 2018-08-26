@@ -8,7 +8,7 @@ export default dispatch => ({
   async createGame({ gridSize, ships, history }, state) {
     const { account, contract, web3 } = state.eth;
 
-    const [secret, salt] = Bs.getSecrets(web3, account, ships);
+    const [secret, salt] = await Bs.obfuscate(web3, ships);
 
     const tx = await contract.createGame(gridSize, secret, {
       from: account,
@@ -25,10 +25,10 @@ export default dispatch => ({
 
   //
   // Join game
-  joinGame({ gameId, ships }, state) {
+  async joinGame({ gameId, ships }, state) {
     const { account, contract, web3 } = state.eth;
 
-    const [secret, salt] = Bs.getSecrets(web3, account, ships);
+    const [secret, salt] = await Bs.obfuscate(web3, ships);
 
     contract.joinGame(gameId, secret, {
       from: account,

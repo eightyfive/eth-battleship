@@ -47,7 +47,7 @@ export default class Application {
 
   async initAccount() {
     this.account = await this.getAccount();
-    const balance = this.getBalance(this.account);
+    const balance = await this.getBalance(this.account);
 
     this.dispatch.eth.setAccount({ account: this.account, balance });
   }
@@ -65,7 +65,15 @@ export default class Application {
   }
 
   getBalance(account) {
-    return this.web3.eth.getBalance(account);
+    return new Promise((resolve, reject) => {
+      this.web3.eth.getBalance(account, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
   }
 
   // event GameCreated(uint gameId, address indexed owner, uint8 gridSize);
