@@ -40,6 +40,11 @@ $ truffle migrate --network ganache
 # Optionally
 $ truffle test
 ```
+### `.env` file
+
+Opposite to common practice, I *did commit* an `.env` file to the repository. This is for convenience for the testers, and most importantly because it is needed in order for babel/node to compile the JS app properly.
+
+This makes sure we can use `import` paths relative to the project root. And avoid node [relative paths hell](https://www.coreycleary.me/escaping-relative-path-hell/).
 
 ### Run
 
