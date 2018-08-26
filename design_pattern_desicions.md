@@ -12,10 +12,12 @@ https://blog.colony.io/token-weighted-voting-implementation-part-1-72f836b5423b
 - Even though the communication happens through `https` I found my solution more elegant, because the unencoded ships positions have even less chances to be compromised
 - I struggled implementing the same hashing client and blockchain side, but eventually succeeded:
 
-```
+```js
 // JS (web3 0.16.x)
 secret = web3.sha3(ships + salt);
+```
 
+```solidity
 // Solidity
 keccak256(abi.encodePacked(ships, salt));
 ```
@@ -54,13 +56,13 @@ At reveal phase, user need to submit to the blockchain the ships positions unenc
 
 Once contract has made sure that `secret`s are matching:
 
-```
+```solidity
 require(secret == games[gameId].secrets[msg.sender]);
 ```
 
 Contract can now check the validity of every "defense" move (hit or miss or cheating) reported by current `msg.sender` during the game:
 
-```
+```solidity
     bytes memory positions = bytes(ships);
     bool cheated = false;
 
