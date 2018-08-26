@@ -2,6 +2,8 @@
 
 Simple battleship game implemented on the ethereum blockchain (solidity).
 
+![Battleship game screenshot](https://raw.githubusercontent.com/eightyfive/eth-battleship/master/screenshot.png)
+
 ## What does it do?
 
 - Player A can create a Battleship game (+ submit `secret` of Player A ships positions)
