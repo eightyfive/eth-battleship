@@ -24,7 +24,7 @@ In order to run this project locally, you will need:
 - [Truffle](https://truffleframework.com/truffle)
 - [Ganache](https://truffleframework.com/ganache)
 - Mac OS (**not** tested on MS Windows)
-- Latest browser (extensive use of ES5)
+- Modern browser with [Metamask](https://metamask.io) installed
 
 ### Install
 
@@ -40,11 +40,17 @@ $ truffle migrate --network ganache
 # Optionally
 $ truffle test
 ```
+### `.env` file
+
+Opposite to common practice, I *did commit* an `.env` file to the repository. This is for convenience for the testers, and most importantly because it is needed in order for babel/node to compile the JS app properly.
+
+This makes sure we can use `import` paths relative to the project root. And avoid node [relative paths hell](https://www.coreycleary.me/escaping-relative-path-hell/).
 
 ### Run
 
 ```
-// Launch Ganache (Mac OS)
+// Assuming Ganache (Mac OS) is launched...
+
 $ npm run start
 
 // Head to http://localhost:3000
