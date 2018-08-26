@@ -8,7 +8,7 @@
 - I did not use `tx.origin`
 - I made sure to avoid most simple attacks by restricting properly my public contract methods with proper modifiers. Most notably given the state of the current game:
 
-```
+```solidity
   modifier onlyPlayer(uint gameId)
   modifier myTurn(uint gameId)
   modifier gameOpen(uint gameId)
@@ -16,5 +16,6 @@
   modifier gameStarted(uint gameId)
   modifier gameFinished(uint gameId)
   modifier notRevealed(uint gameId)
+  modifier notEmergency
 ```
 
