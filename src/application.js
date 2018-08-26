@@ -84,7 +84,7 @@ export default class Application {
   // event GameJoined(uint gameId, address indexed owner, address indexed challenger);
   onGameJoined(result) {
     // Only IF owner of the game
-    if (this.account === result.owner) {
+    if (this.account === result.owner || this.account === result.challenger) {
       this.onEvent(result);
     }
   }

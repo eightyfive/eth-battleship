@@ -210,6 +210,18 @@ contract("Battleship", async accounts => {
       "Wrong winner"
     );
   });
+
+  it("...should +10 overflow (SafeMath)", async () => {
+    const sc = await Battleship.deployed();
+
+    const overflow = 255 + 10;
+
+    const val1 = await sc.safeMath.call(0, overflow);
+    assert.equal(val1.toNumber(), 0, "Value not `0`");
+
+    const val2 = await sc.notSafeMath.call(0, overflow);
+    assert.equal(val2.toNumber(), 9, "Value not `9`");
+  });
 });
 
 function _getSecrets(web3, ships) {

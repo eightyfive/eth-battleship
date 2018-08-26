@@ -1,9 +1,14 @@
 pragma solidity ^0.4.22;
 
+import 'zeppelin/contracts/ownership/Ownable.sol';
+import 'zeppelin/contracts/math/SafeMath.sol';
+
 /// @title Battleship game on ethereum (Consensys Academy Final Project)
 /// @author eightyfive
-contract Battleship
+contract Battleship is Ownable
 {
+  using SafeMath for uint8;
+
   //
   // Constants
   //
@@ -403,5 +408,22 @@ contract Battleship
 
     // GRID_LARGE
     return SHIP_CARRIER + SHIP_BATTLESHIP + SHIP_CRUISER + SHIP_SUBMARINE + SHIP_DESTROYER; // 17
+  }
+
+  //
+  // ConsenSys Final project requirement
+  //
+  function safeMath(uint8 value, uint8 increment) public returns(uint8)
+  {
+    value.add(increment);
+
+    return value;
+  }
+
+  function notSafeMath(uint8 value, uint8 increment) public pure returns(uint8)
+  {
+    value += increment;
+
+    return value;
   }
 }
