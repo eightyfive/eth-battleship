@@ -6,7 +6,7 @@
 - I made sure the `secret` ships positions obfuscating procces is secure (unless I missed something)
 - Since I don't send value, I did not have to protect vs "recursive calls", but would have made sure to clear all balances before calling `send`
 - I did not use `tx.origin`
-- I made sure to avoid most simple attacks by restricting properly my public contract methods with porper `modifier`s. Most notably given the state of the current game:
+- I made sure to avoid most simple attacks by restricting properly my public contract methods with proper `modifier`s. Most notably given the state of the current game:
 
 ```
   modifier onlyPlayer(uint gameId)
