@@ -1,0 +1,54 @@
+.game {
+  cursor: pointer;
+  font-size: 80%;
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+.game:hover {
+  color: yellow;
+}
+.game--disabled {
+  cursor: default;
+}
+.game--disabled:hover {
+  color: inherit;
+}
+.game + .game {
+  margin-top: 12px;
+}
+.game--open:hover button {
+  background-color: gainsboro;
+}
+
+/* META */
+.game__status .label {
+  min-width: 65px;
+}
+.game__grid .label {
+  min-width: 26px;
+}
+
+/* VS */
+.game__vs {
+  display: flex;
+  align-items: center;
+}
+.game__vs small {
+  color: grey;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding-right: 6px;
+}
+
+.game__vsplayer {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* HORIZONTAL ALIGNEMENT */
+.game__grid,
+.game__vs {
+  margin-left: 12px;
+}

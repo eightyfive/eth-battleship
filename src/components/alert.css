@@ -1,0 +1,25 @@
+.alert {
+  padding: 12px;
+  font-size: 90%;
+  border-radius: 2px;
+}
+
+.alert--info {
+  background-color: darkslategrey;
+  color: white;
+}
+
+.alert--success {
+  background-color: green;
+  color: white;
+}
+
+.alert--error {
+  background-color: red;
+  color: white;
+}
+
+.alert--warning {
+  background-color: darkorange;
+  color: white;
+}

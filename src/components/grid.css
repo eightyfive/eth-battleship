@@ -1,0 +1,84 @@
+.grid {
+  border-style: solid;
+  border-color: white;
+  border-width: 1px 0 0 1px;
+  transition: opacity 300ms ease-in-out;
+}
+/*.grid + .grid {
+  margin-top: 24px;
+}*/
+
+.grid--target {
+  background-color: #003300;
+}
+.grid--ocean {
+  background-color: #006994;
+}
+.grid--disabled {
+  cursor: default;
+}
+
+/* Position */
+.grid__position {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  border-style: solid;
+  border-color: white;
+  border-width: 0 1px 1px 0;
+  user-select: none;
+}
+.grid__position--empty {
+  color: transparent;
+}
+
+/* Cosmetic (ship colors) */
+.grid__position--ship-2 {
+  background-color: silver;
+  color: darkslategrey;
+}
+.grid__position--ship-3 {
+  background-color: darkgrey;
+  color: darkslategrey;
+}
+.grid__position--ship-4 {
+  background-color: grey;
+  color: white;
+}
+.grid__position--ship-5 {
+  background-color: dimgrey;
+  color: white;
+}
+
+/* Position states */
+.grid__position--hit {
+  color: red;
+}
+.grid__position--miss {
+  color: white;
+}
+.grid__position--pending {
+  background-color: black;
+}
+
+/* Target grid */
+.grid--target .grid__position--hit {
+  background-color: grey;
+}
+.grid--target .grid__position--miss {
+  background-color: #006994;
+}
+
+/* Selectable grid */
+.grid--selectable .grid__position {
+  cursor: default;
+}
+.grid--selectable .grid__position--empty {
+  cursor: pointer;
+}
+.grid--selectable .grid__position--empty:hover {
+  background-color: white;
+  color: black;
+}
