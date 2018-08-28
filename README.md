@@ -69,9 +69,9 @@ Since my project did not require the use of a library, I created a dedicated uni
 
 ## TODO
 
-Unfortunately I did not have time to do the following:
+Unfortunately I did not have time to do the following, only UI stuff:
 
-- Implement the **UI** of the reveal phase (but "reveal" works in Tests !!)
-- Implement the "betting" part of the challenge
+- Implement the **UI** for reveal phase (but "reveal" works in Tests !!)
+- Implement the **UI** for betting (but "betting" works in Tests !!)
 
 
