@@ -94,10 +94,10 @@ Contract finally figures out who cheated, won, etc.
 
 ## Withdraw pattern
 
-While I did not have the time to code the "betting" part of the project, I believe I laid out the basics properly to integrate such a functionality rather easily.
+I have implemented the "withdraw" pattern to `transfer` game funds to the winner address.
 
-- When game has been revealed, and winner chosen, I would have implemented a new public contract method `withdraw()` allowing only the winner (address) to take the `game.funds`
-- Meaning the funds would have been lost if the two players have cheated (nobody can withdraw)
-- I would have maybe implemented another contract method so owner **of the contract** (me, in this case) could withdraw the lost funds of all games :-P
+_Notes_:
+- The funds are "lost" for both players if the two players have cheated (nobody can withdraw)
+- I could have implemented another contract method so the owner **of the contract** (me, in that case) can withdraw all the "lost" funds of all games :-P
 
 
