@@ -59,6 +59,17 @@ export default class Application {
           reject(err);
         }
 
+        if (!accounts.length) {
+          alert(`
+            No ETH account detected !
+
+            - Is Metamask installed ?
+            - Is Metamask configured to work with Ganache ?
+          `);
+
+          throw new Error("No accounts detected");
+        }
+
         resolve(accounts[0]);
       });
     });

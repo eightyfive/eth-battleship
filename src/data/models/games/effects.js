@@ -109,8 +109,10 @@ export default dispatch => ({
 
       // Cheat?
       if (hit) {
-        let message = `You were HIT on ${position}`;
-        message += "\n\n(Press OK to accept, Cancel to cheat)";
+        const message = `
+          You were HIT on ${position}
+          (Press OK to accept, Cancel to cheat)
+        `;
 
         if (!confirm(message)) {
           // Do cheat...
