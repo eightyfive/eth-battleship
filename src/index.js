@@ -11,24 +11,40 @@ import App from "./App";
 const query = document.location.search.substr(1);
 const params = qs.parse(query);
 
-if (params.provider === "ganache") {
-  cookie("ganache", true);
-} else if (params.provider === "metamask") {
-  cookie("ganache", false);
+//
+// Testing goodies !
+//
+if (params.provider) {
+  cookie("provider", params.provider);
 }
 
-const forceGanache = cookie("ganache");
+if (typeof params.account !== "undefined") {
+  cookie("account", params.account);
+}
+
+// Force use of Ganache (ignore Metamask)
+const ganache = cookie("provider") === "ganache";
+
+let accountIndex;
+
+if (ganache) {
+  accountIndex = cookie("account") || "0";
+  accountIndex = parseInt(accountIndex, 10);
+} else {
+  // Metamask returns only one account
+  accountIndex = 0;
+}
 
 window.addEventListener("load", async ev => {
   let provider;
 
-  // Metamask ?
-  if (!forceGanache && typeof window.web3 !== "undefined") {
+  // Use Metamask ?
+  if (!ganache && typeof window.web3 !== "undefined") {
     provider = window.web3.currentProvider;
   }
 
   const web3 = (window.web3 = createWeb3(provider));
-  const app = new Application(web3, store);
+  const app = new Application(web3, store, accountIndex);
 
   await app.init();
 

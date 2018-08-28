@@ -4,10 +4,11 @@ import { _unshift } from "utils/immutable";
 import BattleshipContract from "../build/contracts/Battleship.json";
 
 export default class Application {
-  constructor(web3, store) {
+  constructor(web3, store, accountIndex) {
     this.web3 = web3;
     this.dispatch = store.dispatch;
     this.account = null;
+    this.accountIndex = accountIndex;
   }
 
   async init() {
@@ -70,7 +71,7 @@ export default class Application {
           throw new Error("No accounts detected");
         }
 
-        resolve(accounts[0]);
+        resolve(accounts[this.accountIndex]);
       });
     });
   }
