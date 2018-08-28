@@ -13,7 +13,7 @@ contract("Battleship", async accounts => {
   let salt1, salt2;
 
   // "Game" struct attributes
-  let status, gridSize, targetIndex, owner, challenger, turn, winner;
+  let status, gridSize, targetIndex, owner, challenger, turn, winner, funds;
 
   let gameId = -1;
 
@@ -21,7 +21,7 @@ contract("Battleship", async accounts => {
   it("...should create game", async () => {
     const sc = await Battleship.deployed();
 
-    gameId++;
+    gameId++; // 0
 
     [secret, salt1] = _getSecrets(web3, ships);
     await sc.createGame(3, secret, { from: playerA });
@@ -40,9 +40,9 @@ contract("Battleship", async accounts => {
 
     try {
       await sc.joinGame(gameId, "SHIPS", { from: playerA });
-      assert(false, "Exception was not thrown");
+      assert.fail("Owner was able to join own game");
     } catch (err) {
-      assert(true, "Exception was thrown");
+      //
     }
   });
 
@@ -79,10 +79,9 @@ contract("Battleship", async accounts => {
 
     try {
       await sc.counterAttack(gameId, 1, false, { from: playerA });
-
-      assert(false, "Exception was thrown");
+      assert.fail("Player was able to play (not player turn)");
     } catch (err) {
-      assert(true, "Exception was not thrown");
+      //
     }
   });
 
@@ -124,7 +123,7 @@ contract("Battleship", async accounts => {
   it("...should be cheating", async () => {
     const sc = await Battleship.deployed();
 
-    gameId++;
+    gameId++; // 1
 
     [secret, salt1] = _getSecrets(web3, ships);
     await sc.createGame(3, secret, { from: playerA });
@@ -161,7 +160,7 @@ contract("Battleship", async accounts => {
   it("...should be BOTH cheating", async () => {
     const sc = await Battleship.deployed();
 
-    gameId++;
+    gameId++; // 2
 
     [secret, salt1] = _getSecrets(web3, ships);
 
@@ -209,6 +208,107 @@ contract("Battleship", async accounts => {
       "0x0000000000000000000000000000000000000000",
       "Wrong winner"
     );
+  });
+
+  // Simple test for Player A  to create a game
+  // with bet
+  it("...should create game with bet", async () => {
+    const sc = await Battleship.deployed();
+
+    gameId++; // 3
+
+    const value = web3.toWei("0.5", "ether");
+
+    [secret, salt1] = _getSecrets(web3, ships);
+    await sc.createGame(3, secret, { from: playerA, value });
+
+    [, , , , , , , funds] = await sc.games.call(gameId);
+
+    assert.equal(funds.toNumber(), value, "Wrong funds");
+  });
+
+  // Simple test to make sure Player B cannot join game
+  // with wrong matching bet
+  it("...should not join game with wrong bet", async () => {
+    const sc = await Battleship.deployed();
+
+    const value = web3.toWei("0.75", "ether");
+
+    try {
+      await sc.joinGame(gameId, "SHIPS", { from: playerB, value });
+      assert.fail("Player was able to join game with wrong matching bet");
+    } catch (err) {
+      //
+    }
+  });
+
+  // Simple test to make sure Player B can join Player A open game
+  // with matching bet
+  it("...should join game with bet", async () => {
+    const sc = await Battleship.deployed();
+
+    const value = web3.toWei("0.5", "ether");
+
+    [secret, salt2] = _getSecrets(web3, ships);
+
+    await sc.joinGame(gameId, secret, { from: playerB, value });
+
+    [, , , , , , , funds] = await sc.games.call(gameId);
+
+    assert.equal(funds.toNumber(), value * 2, "Wrong funds");
+  });
+
+  // Makes sure Loser cannot withdraw funds
+  it("...should not withdraw funds", async () => {
+    const sc = await Battleship.deployed();
+
+    await sc.attack(gameId, 0, { from: playerA });
+    await sc.counterAttack(gameId, 0, true, { from: playerB });
+    await sc.counterAttack(gameId, 1, true, { from: playerA });
+    await sc.counterAttack(gameId, 1, true, { from: playerB });
+
+    await sc.reveal(gameId, ships.join(""), salt1, {
+      from: playerA
+    });
+
+    await sc.reveal(gameId, ships.join(""), salt2, {
+      from: playerB
+    });
+
+    try {
+      // Player A is the winner...
+      await sc.withdraw(gameId, { from: playerB });
+      assert.fail("Loser was able to withdraw funds");
+    } catch (err) {
+      //
+    }
+  });
+
+  // Makes sure Winner can withdraw funds
+  it("...should withdraw game funds", async () => {
+    const sc = await Battleship.deployed();
+
+    const value = web3.toWei("0.5", "ether");
+    const oldBalance = await web3.eth.getBalance(playerA);
+
+    let tx = await sc.withdraw(gameId, { from: playerA });
+
+    const newBalance = await web3.eth.getBalance(playerA);
+    const gasUsed = tx.receipt.gasUsed;
+
+    tx = await web3.eth.getTransaction(tx.receipt.transactionHash);
+
+    const gasCost = tx.gasPrice.mul(gasUsed);
+
+    assert.equal(
+      oldBalance.toNumber() - gasCost + value * 2,
+      newBalance.toNumber(),
+      "Funds not transfered"
+    );
+
+    [, , , , , , , funds] = await sc.games.call(gameId);
+
+    assert.equal(funds.toNumber(), 0, "Funds not 0");
   });
 
   it("...should +10 overflow (SafeMath)", async () => {

@@ -48,6 +48,7 @@ contract Battleship is Ownable
     address challenger;
     address turn;
     address winner;
+    uint funds;
     mapping (address => bytes32) secrets;
     mapping (address => string) ships;
     mapping (address => int8[]) targets;
@@ -67,6 +68,12 @@ contract Battleship is Ownable
   /// @dev Makes sure player is part of the game
   modifier onlyPlayer(uint gameId) {
     require(msg.sender == games[gameId].owner || msg.sender == games[gameId].challenger);
+    _;
+  }
+
+  modifier onlyWinner(uint gameId) {
+    require(games[gameId].status == GameStatus.DONE);
+    require(games[gameId].winner == msg.sender);
     _;
   }
 
@@ -118,12 +125,14 @@ contract Battleship is Ownable
   /// @dev `gameId` Game ID
   /// @dev `owner` Address who created the game
   /// @dev `gridSize` The size of the target/ocean grid
-  event GameCreated(uint gameId, address indexed owner, uint8 gridSize);
+  /// @dev `bet` The amount of the bet
+  event GameCreated(uint gameId, address indexed owner, uint8 gridSize, uint bet);
 
   /// @dev `gameId` Game ID
   /// @dev `owner` Address who created the game
   /// @dev `challenger` Address who joined the open game
-  event GameJoined(uint gameId, address indexed owner, address indexed challenger);
+  /// @dev `bet` The matching amount of the bet
+  event GameJoined(uint gameId, address indexed owner, address indexed challenger, uint bet);
 
   /// @dev `gameId` Game ID
   /// @dev `attacker` Address who performed the attack
@@ -195,7 +204,7 @@ contract Battleship is Ownable
 
   /// @param gridSize Size of the grid(s). Ex: size = 3 --> 9 positions.
   /// @param secret Obfuscated ships positions (revealed at the end of the game)
-  function createGame(uint8 gridSize, bytes32 secret) public notEmergency
+  function createGame(uint8 gridSize, bytes32 secret) public payable notEmergency
   {
     // Game ID is just the normal array index.
     uint gameId = games.length;
@@ -210,29 +219,32 @@ contract Battleship is Ownable
     games[gameId].turn = msg.sender;
     games[gameId].secrets[msg.sender] = secret;
     games[gameId].targets[msg.sender] = new int8[](gridSize ** 2);
+    games[gameId].funds = msg.value;
 
     // Link game to player
     playerGames[msg.sender].push(gameId);
 
-    emit GameCreated(gameId, msg.sender, gridSize);
+    emit GameCreated(gameId, msg.sender, gridSize, msg.value);
   }
 
   /// @param gameId Game ID
   /// @param secret Obfuscated ships positions
-  function joinGame(uint gameId, bytes32 secret) public notEmergency gameOpen(gameId)
+  function joinGame(uint gameId, bytes32 secret) public payable notEmergency gameOpen(gameId)
   {
-    require(msg.sender != games[gameId].owner);
+    require(games[gameId].owner != msg.sender);
+    require(games[gameId].funds == msg.value);
 
     // Update game
     games[gameId].status = GameStatus.READY;
     games[gameId].challenger = msg.sender;
     games[gameId].secrets[msg.sender] = secret;
     games[gameId].targets[msg.sender] = new int8[](games[gameId].gridSize ** 2);
+    games[gameId].funds += msg.value;
 
     // Link game to player
     playerGames[msg.sender].push(gameId);
 
-    emit GameJoined(gameId, games[gameId].owner, msg.sender);
+    emit GameJoined(gameId, games[gameId].owner, msg.sender, msg.value);
   }
 
   /// @param gameId Game ID
@@ -338,18 +350,30 @@ contract Battleship is Ownable
     }
 
     if (cheated) {
-        // If was winner, remove
-        if (games[gameId].winner == msg.sender) {
-          games[gameId].winner = 0x00;
-        }
+      // If was winner, remove
+      if (games[gameId].winner == msg.sender) {
+        games[gameId].winner = 0x00;
+      }
 
-        // If opponent has not cheated, make him winner
-        if (isDone && games[gameId].cheated[opponent] == false) {
-          games[gameId].winner = opponent;
-        }
+      // If opponent has not cheated, make him winner
+      if (isDone && games[gameId].cheated[opponent] == false) {
+        games[gameId].winner = opponent;
+      }
     }
 
     emit GameRevealed(gameId, msg.sender, opponent, ships, cheated);
+  }
+
+  /// @param gameId Game ID
+  /// @dev Only winner can withdraw game funds
+  function withdraw(uint gameId) public onlyWinner(gameId) {
+    uint amount = games[gameId].funds;
+
+    // Remember to zero the game funds before
+    // sending to prevent re-entrancy attacks
+    games[gameId].funds = 0;
+
+    msg.sender.transfer(amount);
   }
 
   //
